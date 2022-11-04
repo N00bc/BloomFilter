@@ -9,7 +9,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author G0dc
@@ -39,7 +42,21 @@ public class BloomFilterAspect {
         boolean isExist = before(proceedingJoinPoint, id);
         String result = "404 not found";
         if (isExist) result = (String) proceedingJoinPoint.proceed();
+        // 后置增强 刷新 Redis key的有效时间
+        after(proceedingJoinPoint, id);
         return result;
+    }
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 后置增强，刷新有效期 防止出现缓存雪崩。
+     * @param proceedingJoinPoint
+     * @param id
+     */
+    private void after(ProceedingJoinPoint proceedingJoinPoint, String id) {
+        stringRedisTemplate.expire(getAnnoValue(proceedingJoinPoint) + id, 30, TimeUnit.MINUTES);
     }
 
     @Autowired

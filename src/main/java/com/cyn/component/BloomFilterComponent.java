@@ -18,8 +18,8 @@ import java.util.List;
 @Component
 public class BloomFilterComponent {
     /**
-     * 参数1：BloomFilter元素值类型
-     * 参数2：BloomFilter中预期加入 key 的数量，此处演示所以直接写死。
+     * 参数1 Funnel funnel：BloomFilter元素值类型
+     * 参数2 int expectedInsertions：BloomFilter中预期加入 key 的数量，此处演示所以直接写死。
      * volatile：为了后续并发新增 key 的全局可见性
      */
     private static volatile BloomFilter<String> USER = BloomFilter.create(Funnels.stringFunnel(StandardCharsets.UTF_8), 1000);

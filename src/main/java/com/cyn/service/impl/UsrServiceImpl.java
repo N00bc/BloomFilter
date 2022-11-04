@@ -12,8 +12,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author G0dc
  * @description 针对表【usr】的数据库操作Service实现
@@ -40,11 +38,6 @@ public class UsrServiceImpl extends ServiceImpl<UsrMapper, Usr> implements UsrSe
                 throw new RuntimeException("用户不存在");
             }
             user = JSON.toJSONString(query);
-            // 将用户存入 Redis
-            stringRedisTemplate.opsForValue().set(key, user, 30, TimeUnit.MINUTES);
-        } else {
-            // 刷新有效时间
-            stringRedisTemplate.expire(key, 30, TimeUnit.MINUTES);
         }
         return user;
     }
